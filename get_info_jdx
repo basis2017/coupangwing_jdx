@@ -3,22 +3,20 @@ from selenium.webdriver.common.keys import Keys
 import time
 
 #Open Chrome
-# driver = webdriver.Chrome()
-# # get all code from jdx (if num == LAST PAGE + 1: break)
-# all_code = []
-
-# num = 13
-# while True:
-#         if num == 15: break
-#         driver.get(f"http://jdx.co.kr/productlist?number=40&recent=a&page={num}")
-#         time.sleep(2)
-#         elems = driver.find_elements_by_css_selector(".bt-tp-nor.light.wishadd")
-#         for elem in elems:
-#             all_code.append(elem.get_attribute("data-type1"))
-#         num += 1
-
 driver = webdriver.Chrome()
-all_code = ["X2RWPTM06NA", "X1RWWVW52DG"]
+
+# get all code from jdx (if num == LAST PAGE + 1: break)
+all_code = []
+
+num = 1
+while True:
+        if num == 15: break
+        driver.get(f"http://jdx.co.kr/productlist?number=40&recent=a&page={num}")
+        time.sleep(2)
+        elems = driver.find_elements_by_css_selector(".bt-tp-nor.light.wishadd")
+        for elem in elems:
+            all_code.append(elem.get_attribute("data-type1"))
+        num += 1
 
 #get info from code(name, ori_price, sale_price, photo_front, photo_detail)
 dic_code = {}
@@ -55,7 +53,7 @@ for code in all_code:
     sale_price = {'sale_price': sale_price}
     photo_front = {'photo_front': photo_front}
     photo_detail = {'photo_detail': photo_detail}
-
+    
     code_info = [name, ori_price, sale_price, photo_front, photo_detail]
     dic_code[code] = code_info
 
@@ -63,8 +61,6 @@ with open("C:/Users/bel03/OneDrive/바탕 화면/WORK/coupang/jdx/jdx_info.txt",
     f.write(str(dic_code))
 
 driver.close()
-
-
 
 
 # assert "Python" in driver.title
