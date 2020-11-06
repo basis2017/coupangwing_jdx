@@ -18,7 +18,7 @@ import time
 #         num += 1
 
 driver = webdriver.Chrome()
-all_code = ["X2RWPTM06NA"]
+all_code = ["X2RWPTM06NA", "X1RWWVW52DG"]
 
 #get info from code(name, ori_price, sale_price, photo_front, photo_detail)
 dic_code = {}
@@ -49,10 +49,19 @@ for code in all_code:
             i += 1
         except:
             break
+
+    name = {'name': name}
+    ori_price = {'ori_price': ori_price}
+    sale_price = {'sale_price': sale_price}
+    photo_front = {'photo_front': photo_front}
+    photo_detail = {'photo_detail': photo_detail}
+
     code_info = [name, ori_price, sale_price, photo_front, photo_detail]
     dic_code[code] = code_info
 
-print(dic_code)
+with open("C:/Users/bel03/OneDrive/바탕 화면/WORK/coupang/jdx/jdx_info.txt", 'w') as f:
+    f.write(str(dic_code))
+
 driver.close()
 
 
