@@ -18,11 +18,23 @@ while True:
             all_code.append(elem.get_attribute("data-type1"))
         num += 1
 
+#save all_code to txt
+with open("C:/Users/bel03/OneDrive/바탕 화면/WORK/coupang/jdx/jdx_all_code.txt", 'a') as f:
+    f.write(str(all_code))
+
+driver.close()
+
+
+#open jdx_all_code.txt as all_code
+with open("C:/Users/bel03/OneDrive/바탕 화면/WORK/coupang/jdx/jdx_all_code.txt", 'r') as f:
+    all_code = f.readline()
+    print(all_code)
+
 #get info from code(name, ori_price, sale_price, photo_front, photo_detail)
 dic_code = {}
 for code in all_code:
     driver.get(f"http://jdx.co.kr/detail?productcode={code}")
-
+    time.sleep(10)
     photo_front = []
     i = 1 
     name = driver.find_element_by_xpath("/html/body/section/div[1]/div[2]/div[2]/h1")
@@ -57,7 +69,7 @@ for code in all_code:
     code_info = [name, ori_price, sale_price, photo_front, photo_detail]
     dic_code[code] = code_info
 
-with open("C:/Users/bel03/OneDrive/바탕 화면/WORK/coupang/jdx/jdx_info.txt", 'w') as f:
+with open("C:/Users/bel03/OneDrive/바탕 화면/WORK/coupang/jdx/jdx_info.txt", 'a') as f:
     f.write(str(dic_code))
 
 driver.close()
