@@ -1,0 +1,65 @@
+import os
+import time
+import hmac, hashlib
+import urllib.parse
+import urllib.request
+import ssl
+import json
+
+os.environ['TZ'] = 'GMT+0'
+datetime=time.strftime('%y%m%d')+'T'+time.strftime('%H%M%S')+'Z'
+
+method = "GET"
+category_list = [80903, 80904, 80905, 80908, 80987, 80988, 80990, 80991, 80993, 80994, 80999, 81000, 81002, 81003, 81005, 81006, 81011, 81012, 81014]
+metadata = {}
+for category in category_list:
+    #replace with your own vendorId
+    path = f"/v2/providers/seller_api/apis/api/v1/marketplace/meta/category-related-metas/display-category-codes/{category}"
+    message = datetime+method+path
+
+    #replace with your own accesskey
+    accesskey = "d2e4563f-7cfa-4996-97a5-852d396283ea"
+    #replace with your own secretKey
+    secretkey = "aa9360008f284772e907325d357a59ff2b8cd657"
+
+    #********************************************************#
+    #authorize, demonstrate how to generate hmac signature here
+    signature=hmac.new(secretkey.encode('utf-8'),message.encode('utf-8'),hashlib.sha256).hexdigest()
+    authorization  = "CEA algorithm=HmacSHA256, access-key="+accesskey+", signed-date="+datetime+", signature="+signature
+    #print out the hmac key
+    #print(authorization)
+    #********************************************************#
+
+    # ************* SEND THE REQUEST *************
+    url = "https://api-gateway.coupang.com"+path
+
+    req = urllib.request.Request(url)
+
+    req.add_header("Content-type","application/json;charset=UTF-8")
+    req.add_header("Authorization",authorization)
+
+    req.get_method = lambda: method
+
+    ctx = ssl.create_default_context()
+    ctx.check_hostname = False
+    ctx.verify_mode = ssl.CERT_NONE
+
+    try:
+        resp = urllib.request.urlopen(req,context=ctx)
+    except urllib.request.HTTPError as e:
+        print(e.code)
+        print(e.reason)
+        print(e.fp.read())
+    except urllib.request.URLError as e:
+        print(e.errno)
+        print(e.reason)
+        print(e.fp.read())
+    else:
+        # 200
+        body = resp.read().decode(resp.headers.get_content_charset())
+        body.replace("'", '"')
+        body = json.loads(body)
+        metadata[f"{category}"] = body
+
+with open("C:\\Users\\bel03\OneDrive\\바탕 화면\\WORK\\coupang\\jdx\\jdx_metadata.py", "w", encoding="utf-8") as f:
+    json.dump(metadata, f, ensure_ascii=False)
