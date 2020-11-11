@@ -1,0 +1,6 @@
+displayCategoryCode: 카테고리 번호
+sellerProductName: 등록상품명 코드o (6층_JDX_제품명_코드)
+displayProductName: 노출상품명 코드x (JDX_제품명_평촌점) 
+generalProductName: 제품명 (제품명_평촌점)
+originalPrice: ori_price
+salePrice: sale_price
