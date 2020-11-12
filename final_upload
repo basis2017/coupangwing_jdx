@@ -6,6 +6,60 @@ import urllib.request
 import ssl
 import json
 
+#********************************************************#
+import json
+with open("C:\\Users\\bel03\OneDrive\\바탕 화면\\WORK\\coupang\\jdx\\jdx_result2.py", "r", encoding="utf-8") as f:
+    all_data = json.load(f)
+
+all_code = list(all_data.keys())
+for code in all_code:
+	code_dict = all_data[f"{code}"]
+	displayCategoryCode =  code_dict["displayCategoryCode"] #str
+	sellerProductName = code_dict["sellerProductName"] #str
+	displayProductName = code_dict["displayProductName"] #str
+	generalProductName = code_dict["generalProductName"] #str
+	originalPrice = int(code_dict["originalPrice"]) #str
+	salePrice = int(code_dict["salePrice"]) #str
+	attributeTypeName_size = code_dict["attributeTypeName_size"] #list
+	attributeTypeName_color = code_dict["attributeTypeName_color"] #str
+	imageType_REPRESENTATION = code_dict["imageType_REPRESENTATION"] #list
+	imageType_DETAIL = code_dict["imageType_DETAIL"] #str
+	print(type(displayCategoryCode))
+	print(displayCategoryCode)
+	break
+
+#********************************************************##********************************************************#
+#make "images" parameter
+
+img_val = []
+i = 0
+for front_photo in imageType_REPRESENTATION:
+    img = {}
+    img["imageOrder"] = i
+    img["imageType"] = "REPRESENTATION"
+    img["vendorPath"] = front_photo
+    img_val.append(img)
+    i += 1
+
+img_val.append(
+        {
+    "imageOrder": i,
+    "imageType": "DETAIL",
+    "vendorPath": "http://thumbnail10.coupangcdn.com/thumbnails/remote/q89/image/vendor_inventory/31f1/5afd38c12424908d0762e77965fc77dad84a2d72a000f8f1c2cd3cef0513.jpg"
+    }
+)
+
+img_val.append(
+        {
+    "imageOrder": i+1,
+    "imageType": "DETAIL",
+    "vendorPath": f"{imageType_DETAIL}"
+    }
+)
+
+#********************************************************##********************************************************#
+
+
 os.environ['TZ'] = 'GMT+0'
 
 datetime=time.strftime('%y%m%d')+'T'+time.strftime('%H%M%S')+'Z'
@@ -28,35 +82,6 @@ authorization  = "CEA algorithm=HmacSHA256, access-key="+accesskey+", signed-dat
 #print(authorization)
 #********************************************************#
 
-import json
-with open("C:\\Users\\bel03\OneDrive\\바탕 화면\\WORK\\coupang\\jdx\\jdx_result2.py", "r", encoding="utf-8") as f:
-    all_data = json.load(f)
-
-all_code = list(all_data.keys())
-for code in all_code:
-	code_dict = all_data[f"{code}"]
-	displayCategoryCode =  code_dict["displayCategoryCode"] #str
-	sellerProductName = code_dict["sellerProductName"] #str
-	displayProductName = code_dict["displayProductName"] #str
-	generalProductName = code_dict["generalProductName"] #str
-	originalPrice = int(code_dict["originalPrice"]) #str
-	salePrice = int(code_dict["salePrice"]) #str
-	attributeTypeName_size = code_dict["attributeTypeName_size"] #list
-	attributeTypeName_color = code_dict["attributeTypeName_color"] #str
-	imageType_REPRESENTATION = code_dict["imageType_REPRESENTATION"] #list
-	imageType_DETAIL = code_dict["imageType_DETAIL"] #str
-	print(type(originalPrice))
-	print(originalPrice)
-	break
-
-
-
-
-
-
-
-
-
 # ************* SEND THE REQUEST *************
 url = "https://api-gateway.coupang.com"+path
 
@@ -64,140 +89,142 @@ true=True
 false=False
 null = None
 strjson={ 
-		"displayCategoryCode": 56137,
+		"displayCategoryCode": displayCategoryCode,
 		"sellerProductName": f"{sellerProductName}",
-		"vendorId": "A00012345",
-		"saleStartedAt": "2018-08-13T00:00:00",
+		"vendorId": "A00138689",
+		"saleStartedAt": "2020-11-12T00:00:00",
 		"saleEndedAt": "2099-01-01T23:59:59",
-		"displayProductName": "해피바스 솝베리 클렌징 오일",
-		"brand": "해피바스",
-		"generalProductName": "솝베리 클렌징 오일",
-		"productGroup": "클렌징 오일",
+		"displayProductName": f"{displayCategoryCode",
+		"brand": "JDX",
+		"generalProductName": f"{generalProductName}",
+		# "productGroup": "클렌징 오일",
 		"deliveryMethod": "SEQUENCIAL",
 		"deliveryCompanyCode": "KGB",
-		"deliveryChargeType": "FREE",
-		"deliveryCharge": 0,
-		"freeShipOverAmount": 0,
+		"deliveryChargeType": "CONDITIONAL_FREE",
+		"deliveryCharge": 2500,
+		"freeShipOverAmount": 9800,
 		"deliveryChargeOnReturn": 2500,
 		"remoteAreaDeliverable": "N",
 		"unionDeliveryType": "UNION_DELIVERY",
-		"returnCenterCode": "1000274592",
-		"returnChargeName": "반품지_1",
-		"companyContactNumber": "02-1234-678",
-		"returnZipCode": "135-090",
-		"returnAddress": "서울특별시 강남구 삼성동",
-		"returnAddressDetail": "333",
+		"returnCenterCode": "1000517251",
+		"returnChargeName": "경기도 안양시 동안로 119 뉴코아아울렛 평촌점 9층 온라인사무실",
+		"companyContactNumber": "031-380-1451",
+		"returnZipCode": "14073",
+		"returnAddress": "경기도 안양시 동안구 동안로 119 (호계동)",
+		"returnAddressDetail": "뉴코아아울렛 평촌점 9층 온라인 사무실_4",
 		"returnCharge": 2500,
-		"returnChargeVendor": "N",
-		"afterServiceInformation": "A/S안내 1544-1255",
-		"afterServiceContactNumber": "1544-1255",
-		"outboundShippingPlaceCode": "74010",
-		"vendorUserId": "user01",
+		# "returnChargeVendor": "N",
+		# "afterServiceInformation": "A/S안내 1544-1255",
+		# "afterServiceContactNumber": "1544-1255",
+		"outboundShippingPlaceCode": 1790006,
+		"vendorUserId": "aa4151",
 		"requested": false,
 		"items": [
 		  {
 			"itemName": "200ml_1개",
-			"originalPrice": 13000,
-			"salePrice": 10000,
-			"maximumBuyCount": "100",
-			"maximumBuyForPerson": "0",
-			"outboundShippingTimeDay": "1",
-			"maximumBuyForPersonPeriod": "1",
+			"originalPrice": originalPrice,
+			"salePrice": salePrice,
+			"maximumBuyCount": 3,
+			"maximumBuyForPerson": 0,
+			"outboundShippingTimeDay": 2,
+			"maximumBuyForPersonPeriod": 1,
 			"unitCount": 1,
 			"adultOnly": "EVERYONE",
 			"taxType": "TAX",
 			"parallelImported": "NOT_PARALLEL_IMPORTED",
 			"overseasPurchased": "NOT_OVERSEAS_PURCHASED",
 			"pccNeeded": "false",
-			"externalVendorSku": "0001",
-			"barcode": "",
-			"emptyBarcode": true,
-			"emptyBarcodeReason": "상품확인불가_바코드없음사유",
-			"modelNo": "1717171",
-			"extraProperties": null,
-			"certifications": [
-			  {
-				"certificationType": "NOT_REQUIRED",
-				"certificationCode": ""
-			  }
+			# "externalVendorSku": "0001",
+			# "barcode": "",
+			# "emptyBarcode": true,
+			# "emptyBarcodeReason": "상품확인불가_바코드없음사유",
+			# "modelNo": "1717171",
+			# "extraProperties": null,
+			# "certifications": [
+			#   {
+			# 	"certificationType": "NOT_REQUIRED",
+			# 	"certificationCode": ""
+			#   }
 			],
 			"searchTags": [
-			  "검색어1",
-			  "검색어2"
+			  "jdx",
+			  "JDX",
+			  "jdx 평촌점",
+			  "jdx 남성",
+			  "jdx 여성",
+			  "jdx 골프웨어 남성",
+			  "jdx 골프웨어 여성",
+			  "jdx 골프 웨어",
+			  "남성 골프 웨어",
+			  "여성 골프 웨어",
+			  "골프 웨어 이월상품",
+			  "골프 웨어",
+			  "골프 바지",
+			  "골프 티셔츠",
+			  "골프 점퍼",
+			  "골프화",
+			  "남성 스포츠웨어",
+			  "여성 스포츠웨어",
+			  "웨스트우드 이월상품",
 			],
 			"images": [
-			  {
-				"imageOrder": 0,
-				"imageType": "REPRESENTATION",
-				"vendorPath": "http://image11.coupangcdn.com/image/product/image/vendoritem/2018/06/25/3719529368/27a6b898-ff3b-4a27-b1e4-330a90c25e9c.jpg"
-			  },
-			  {
-				"imageOrder": 1,
-				"imageType": "DETAIL",
-				"vendorPath": "http://image11.coupangcdn.com/image/product/image/vendoritem/2017/02/21/3000169918/34b79649-d625-4f49-a260-b78bf7a573a8.jpg"
-			  },
-			  {
-				"imageOrder": 2,
-				"imageType": "DETAIL",
-				"vendorPath": "http://image11.coupangcdn.com/image/product/image/vendoritem/2018/06/28/3000169918/5716aa61-70bd-47cd-8f3d-f3d49e7f496d.jpg"
-			  }
+				img_val
 			],
 			"notices": [
 			{
+				"noticeCategoryName": "의류",
 				"noticeCategoryDetailName": "제품 소재",
-				"required": "MANDATORY"
+				"required": "상세페이지 참조"
 			},
 			{
+				"noticeCategoryName": "의류",
 				"noticeCategoryDetailName": "색상",
-				"required": "MANDATORY"
+				"required": "상세페이지 참조"
 			},
 			{
+				"noticeCategoryName": "의류",
 				"noticeCategoryDetailName": "치수",
-				"required": "MANDATORY"
+				"required": "상세페이지 참조"
 			},
 			{
+				"noticeCategoryName": "의류",
 				"noticeCategoryDetailName": "제조자(수입자)",
-				"required": "MANDATORY"
+				"required": "상세페이지 참조"
 			},
 			{
+				"noticeCategoryName": "의류",
 				"noticeCategoryDetailName": "제조국",
-				"required": "MANDATORY"
+				"required": "상세페이지 참조"
 			},
 			{
+				"noticeCategoryName": "의류",
 				"noticeCategoryDetailName": "세탁방법 및 취급시 주의사항",
-				"required": "MANDATORY"
+				"required": "상세페이지 참조"
 			},
 			{
+				"noticeCategoryName": "의류",
 				"noticeCategoryDetailName": "제조연월",
-				"required": "MANDATORY"
+				"required": "상세페이지 참조"
 			},
 			{
+				"noticeCategoryName": "의류",
 				"noticeCategoryDetailName": "품질보증기준",
-				"required": "MANDATORY"
+				"required": "상세페이지 참조"
 			},
 			{
+				"noticeCategoryName": "의류",
 				"noticeCategoryDetailName": "A/S 책임자와 전화번호",
-				"required": "MANDATORY"
+				"required": "031-380-1451"
 			}
 			],
 			"attributes": [
 			  {
                 "attributeTypeName": "패션의류/잡화 사이즈",
-                "dataType": "STRING",
-                "basicUnit": "없음",
-                "usableUnits": [],
-                "required":"MANDATORY",
-                "groupNumber":"NONE",
-                "exposed":"EXPOSED"
+				"attributeValueName": f"{attributeTypeName_size[size_cnt]}"    
 			  },
 			  {
                 "attributeTypeName": "색상",
-                "dataType": "STRING",
-                "basicUnit": "없음",
-                "usableUnits": [],
-                "required":"MANDATORY",
-                "groupNumber":"NONE",
-                "exposed":"EXPOSED"
+				"attributeValueName": f"{attributeTypeName_color}"
 			  }
 			],
 			"contents": [
@@ -205,14 +232,14 @@ strjson={
 				"contentsType": "TEXT",
 				"contentDetails": [
 				  {
-					"content": "<img src='http://image11.coupangcdn.com/image/product/content/vendorItem/2018/06/26/196713/738d905f-ed80-4fd8-ad21-ed87b195a19e.jpg' />",
+					"content": "http://jdx.coreits.co.kr/jdx/X123_topss",
 					"detailType": "TEXT"
 				  }
 				]
 			  }
 			],
-			"offerCondition": "NEW",
-			"offerDescription": ""
+			# "offerCondition": "NEW",
+			# "offerDescription": ""
 		  },
 		  {
 			"itemName": "200ml_2개",
