@@ -121,7 +121,7 @@ strjson={
 		"requested": false,
 		"items": [
 		  {
-			"itemName": "200ml_1개",
+			"itemName": "itemName": f"{attributeTypeName_color} {attributeTypeName_size}",,
 			"originalPrice": originalPrice,
 			"salePrice": salePrice,
 			"maximumBuyCount": 3,
@@ -167,9 +167,7 @@ strjson={
 			  "여성 스포츠웨어",
 			  "웨스트우드 이월상품",
 			],
-			"images": [
-				img_val
-			],
+			"images": img_val,
 			"notices": [
 			{
 				"noticeCategoryName": "의류",
