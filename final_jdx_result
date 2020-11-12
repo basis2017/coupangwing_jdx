@@ -33,11 +33,12 @@ import json
 ##############start#################
 
 #get category num from jdx code
-with open("C:\\Users\\bel03\OneDrive\\바탕 화면\\WORK\\coupang\\jdx\\jdx_category_real.py", "r") as ff:
+with open("C:\\Users\\bel03\OneDrive\\바탕 화면\\WORK\\coupang\\jdx\\jdx_category_num_by_code.py", "r", encoding="utf-8") as ff:
     data = json.load(ff)
 
 data_M = data["M"]
 data_W = data["W"]
+data_C = data["color_code"]
 displayCategoryCode = []
 
 #get jdx info
@@ -71,21 +72,45 @@ for code in codes:
     jdx_result["imageType_REPRESENTATION"] = imageType_REPRESENTATION
     jdx_result["imageType_DETAIL"] = imageType_DETAIL
     
-    # final_jdx_result[code] = jdx_result
+    # final_jdx_result[code] = jdx_result /// + get size by gender
     if code[6] == "M":
         data = data_M
+        if code[4] == "P":
+            attributeTypeName_size = [78, 82, 84, 86, 88, 92]
+        elif code[4] == "T" or "S" or "W":
+            attributeTypeName_size = [95, 100, 105, 110]
+        elif code[4:6] == "AT":
+            attributeTypeName_size = [255, 260, 265, 270, 275]
+        else:
+            attributeTypeName_size = "FREE"
     else:
         data = data_W
+        if code[4] == "P":
+            attributeTypeName_size = [64, 67, 70, 73, 76]
+        elif code[4] == "T" or "S" or "W":
+            attributeTypeName_size = [90, 95, 100, 105]
+        elif code[4:6] == "AT":
+            attributeTypeName_size = [230, 235, 240, 245, 250]
+        else:
+            attributeTypeName_size = "FREE"
 
     if code[4:6] in list(data.keys()):
         pro_code = code[4:6]
         displayCategoryCode = data[pro_code]
+
+    if code[-2:] in list(data_C.keys()):
+        color_code = code[-2:]
+        attributeTypeName_color = data_C[color_code]
+    else:
+        attributeTypeName_color = "단일색상"
+
     
     jdx_result["displayCategoryCode"] = displayCategoryCode
+    jdx_result["attributeTypeName_size"] = attributeTypeName_size
+    jdx_result["attributeTypeName_color"] = attributeTypeName_color
 
     final_jdx_result[code] = jdx_result
 
-
-with open("C:\\Users\\bel03\OneDrive\\바탕 화면\\WORK\\coupang\\jdx\\jdx_result.py", "w", encoding="utf-8") as f:
-    json.dump(final_jdx_result, f)
+with open("C:\\Users\\bel03\OneDrive\\바탕 화면\\WORK\\coupang\\jdx\\jdx_result2.py", "w", encoding="utf-8") as f:
+    json.dump(final_jdx_result, f, ensure_ascii=False)
         
