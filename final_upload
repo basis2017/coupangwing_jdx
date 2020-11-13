@@ -1,6 +1,7 @@
 ##########test real
 
 import os
+import sys
 import time
 import hmac
 import hashlib
@@ -8,6 +9,9 @@ import urllib.parse
 import urllib.request
 import ssl
 import json
+from PIL import Image
+from selenium import webdriver
+from selenium.webdriver.common.keys import Keys
 
 #********************************************************#
 import json
@@ -59,30 +63,81 @@ for code in all_code:
 #make "images" parameter
 
 	img_val = []
-	i = 0
-	for front_photo in imageType_REPRESENTATION:
-		img = {}
-		img["imageOrder"] = i
-		img["imageType"] = "REPRESENTATION"
-		img["vendorPath"] = front_photo
-		img_val.append(img)
-		i += 1
+
+	def make_square(im, min_size=1380, fill_color=(255, 255, 255, 0)):
+		x, y = im.size
+		size = max(min_size, x, y)
+		new_im = Image.new('RGBA', (size, size), fill_color)
+		new_im.paste(im, (int((size - x) / 2), int((size - y) / 2)))
+		return new_im
+
+	#imageType_DETAIL
+	urllib.request.urlretrieve(imageType_DETAIL, "ori_photo.png")
+	img = Image.open("ori_photo.png")
+	width, height = img.size
+
+	magic_num = 2
+	while height / magic_num >= 5000:
+		magic_num += 1
+
+	same_height = height / magic_num
+	n = 1
+	a = 0
+	b = same_height
+	for _ in range(magic_num):
+		try:
+			crop = img.crop((0, a, 1380, b))
+			crop.save("imgcrop.png")
+			test = Image.open("imgcrop.png")
+			new = make_square(test)
+			new.save(f"c:/jdximg/new{n}.png")
+			n += 1
+			a += same_height
+			b += same_height
+		except:
+			break
+	break
+
+	img_val.append(
+            {
+		"imageOrder": 0,
+		"imageType": "REPRESENTATION",
+		"vendorPath": f"{imageType_REPRESENTATION[0]}"
+		}
+	)
 
 	img_val.append(
 			{
-		"imageOrder": i,
+		"imageOrder": 1,
 		"imageType": "DETAIL",
 		"vendorPath": "http://thumbnail10.coupangcdn.com/thumbnails/remote/q89/image/vendor_inventory/31f1/5afd38c12424908d0762e77965fc77dad84a2d72a000f8f1c2cd3cef0513.jpg"
 		}
 	)
 
-	img_val.append(
-			{
-		"imageOrder": i+1,
-		"imageType": "DETAIL",
-		"vendorPath": f"{imageType_DETAIL}"
-		}
-	)
+	i = 2
+	for front_photo in imageType_REPRESENTATION:
+		img = {}
+		img["imageOrder"] = i
+		img["imageType"] = "DETAIL"
+		img["vendorPath"] = front_photo
+		img_val.append(img)
+		i += 1
+
+	# img_val.append(
+	# 		{
+	# 	"imageOrder": i+1,
+	# 	"imageType": "DETAIL",
+	# 	"vendorPath": "https://ifh.cc/g/klM2BL.jpg"
+	# 	}
+	# )
+
+	# img_val.append(
+	# 		{
+	# 	"imageOrder": i+2,
+	# 	"imageType": "DETAIL",
+	# 	"vendorPath": "vendor_inventory/21a6/d879eb24a8b8faecefa48b41b518defb67b42521cdad284797b8cf445644.jpg"
+	# 	}
+	# )
 
 	#****************************************************************************************************************#
 	#make "items" parameter
@@ -204,7 +259,7 @@ for code in all_code:
 			"displayCategoryCode": displayCategoryCode,
 			"sellerProductName": f"{sellerProductName}",
 			"vendorId": "A00138689",
-			"saleStartedAt": "2020-11-12T00:00:00",
+			"saleStartedAt": "2020-11-12T20:20:00",
 			"saleEndedAt": "2020-12-01T23:59:59",
 			"displayProductName": f"{displayProductName}",
 			"brand": "JDX_",
@@ -264,5 +319,46 @@ for code in all_code:
 		# 200
 		body = resp.read().decode(resp.headers.get_content_charset())
 		print(body)
-
+		print(body[-12:-1])
+	
 	break
+
+#****************************************************************************************************************
+#selenium detail image upload
+from selenium import webdriver
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.by import By
+import pyautogui
+import time
+
+magic_num =2
+
+# body_code = body[-12:-1]
+body_code = 11341176549
+driver = webdriver.Chrome()
+driver.get(f"https://wing.coupang.com/tenants/seller-web/vendor-inventory/modify?vendorInventoryId={body_code}&searchIds=&startTime=2000-01-01&endTime=2099-12-31&productName=&brandName=&manufacturerName=&productType=&dateType=productRegistrationDate&dateRangeShowStyle=true&dateRange=all&saleEndDatePeriodType=&includeUsedProduct=&deleteType=false&deliveryMethod=&shippingType=&shipping=&otherType=&productStatus=SAVED,WAIT_FOR_SALE,SOLD_OUT,END_FOR_SALE,APPROVING,IN_REVIEW,DENIED,APPROVED&advanceConditionShow=false&displayCategoryCodes=&currentMenuCode=&page=1&countPerPage=50&sortField=vendorInventoryId&desc=true&fromListV2=true")
+elem_id = driver.find_element_by_id("userID")
+elem_id.send_keys("aa4151")
+elem_pw = driver.find_element_by_id("userPWD")
+elem_pw.send_keys("kk8929$$")
+elem_pw.send_keys(Keys.RETURN)
+time.sleep(2)
+
+checkB = driver.find_element_by_xpath("/html/body/div[1]/div[2]/div/div[2]/div[5]/div/div/div[2]/div/div/div[2]/div/div[3]/table/thead/tr/th[1]/span/input")
+checkB.send_keys(webdriver.common.keys.Keys.SPACE)
+element_present = EC.presence_of_element_located((By.XPATH, "//*[@id='panel-product-image']/div/div/div[2]/div/div/div[2]/div/div[2]/a[2]"))  # Example xpath
+for i in range(magic_num):	
+	WebDriverWait(driver, 10).until(element_present).click() # This opens the windows file selector
+	time.sleep(1)
+	pyautogui.write(f"C:\\jdximg\\new{i+1}.png", interval=0.1) 
+	pyautogui.press('return')
+
+
+saveB = driver.find_element_by_xpath("/html/body/div[1]/div[2]/div/div[2]/footer/div/div/div[2]/button[1]")
+saveB.send_keys(webdriver.common.keys.Keys.SPACE)
+
+	# driver.find_element_by_css_selector("input[type='file']").send_keys(r"C:\Users\user-pc\Desktop\test.PNG")
+
+PendingDeprecationWarning
