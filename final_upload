@@ -3,6 +3,7 @@
 import os
 import sys
 import time
+from time import strftime, gmtime
 import hmac
 import hashlib
 import urllib.parse
@@ -12,6 +13,10 @@ import json
 from PIL import Image
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.by import By
+import pyautogui
 
 #********************************************************#
 import json
@@ -35,8 +40,8 @@ for code in all_code:
 	imageType_REPRESENTATION = code_dict["imageType_REPRESENTATION"]  # list
 	imageType_DETAIL = code_dict["imageType_DETAIL"]  # str
 
-#****************************************************************************************************************#
-#make "noticeCategories" parameter
+	#****************************************************************************************************************#
+	#make "noticeCategories" parameter
 	noticeCategoryDetailName_list = [] #['제품 소재', '색상', '치수']
 	meta_by_code = metadata[f"{displayCategoryCode}"]["data"]["noticeCategories"][0]
 	noticeCategoryName = meta_by_code["noticeCategoryName"] #의류
@@ -52,16 +57,23 @@ for code in all_code:
 	notice_val = []
 
 	for name in noticeCategoryDetailName_list:
-		notice_dict = {}
-		notice_dict["noticeCategoryName"] = noticeCategoryName
-		notice_dict["noticeCategoryDetailName"] = name
-		notice_dict["content"] = "상세페이지 참조"
+		if name == "A/S 책임자와 전화번호":
+			notice_dict = {}
+			notice_dict["noticeCategoryName"] = noticeCategoryName
+			notice_dict["noticeCategoryDetailName"] = name
+			notice_dict["content"] = "031-380-1451"
+		else:
+			notice_dict = {}
+			notice_dict["noticeCategoryName"] = noticeCategoryName
+			notice_dict["noticeCategoryDetailName"] = name
+			notice_dict["content"] = "상세페이지 참조"
 
 		notice_val.append(notice_dict)
 
-#****************************************************************************************************************#
-#make "images" parameter
+	#****************************************************************************************************************#
+	#make "images" parameter
 
+	# imageType_DETAIL = "http://jdx.coreits.co.kr/jdx/X1RWSPW58-CO"
 	img_val = []
 
 	def make_square(im, min_size=1380, fill_color=(255, 255, 255, 0)):
@@ -80,7 +92,8 @@ for code in all_code:
 	while height / magic_num >= 5000:
 		magic_num += 1
 
-	same_height = height / magic_num
+	magic_num += 1
+	same_height = height / (magic_num)
 	n = 1
 	a = 0
 	b = same_height
@@ -96,7 +109,6 @@ for code in all_code:
 			b += same_height
 		except:
 			break
-	break
 
 	img_val.append(
             {
@@ -110,34 +122,19 @@ for code in all_code:
 			{
 		"imageOrder": 1,
 		"imageType": "DETAIL",
-		"vendorPath": "http://thumbnail10.coupangcdn.com/thumbnails/remote/q89/image/vendor_inventory/31f1/5afd38c12424908d0762e77965fc77dad84a2d72a000f8f1c2cd3cef0513.jpg"
+		"vendorPath": "https://i.esdrop.com/d/Li2uh5FG5E.png"
 		}
 	)
-
-	i = 2
-	for front_photo in imageType_REPRESENTATION:
-		img = {}
-		img["imageOrder"] = i
-		img["imageType"] = "DETAIL"
-		img["vendorPath"] = front_photo
-		img_val.append(img)
-		i += 1
-
-	# img_val.append(
-	# 		{
-	# 	"imageOrder": i+1,
-	# 	"imageType": "DETAIL",
-	# 	"vendorPath": "https://ifh.cc/g/klM2BL.jpg"
-	# 	}
-	# )
-
-	# img_val.append(
-	# 		{
-	# 	"imageOrder": i+2,
-	# 	"imageType": "DETAIL",
-	# 	"vendorPath": "vendor_inventory/21a6/d879eb24a8b8faecefa48b41b518defb67b42521cdad284797b8cf445644.jpg"
-	# 	}
-	# )
+	
+	if magic_num <= 6:
+		i = 2
+		for front_photo in imageType_REPRESENTATION:
+			img = {}
+			img["imageOrder"] = i
+			img["imageType"] = "DETAIL"
+			img["vendorPath"] = front_photo
+			img_val.append(img)
+			i += 1
 
 	#****************************************************************************************************************#
 	#make "items" parameter
@@ -152,7 +149,7 @@ for code in all_code:
 				"salePrice": salePrice,
 				"maximumBuyCount": 3,
 				"maximumBuyForPerson": 0,
-				"outboundShippingTimeDay": 2,
+				"outboundShippingTimeDay": 1,
 				"maximumBuyForPersonPeriod": 1,
 				"unitCount": 1,
 				"adultOnly": "EVERYONE",
@@ -160,7 +157,7 @@ for code in all_code:
 				"parallelImported": "NOT_PARALLEL_IMPORTED",
 				"overseasPurchased": "NOT_OVERSEAS_PURCHASED",
 				"pccNeeded": "false",
-				# "externalVendorSku": "0001",
+				# "externalVendorSku": "A00138689",
 				# "barcode": "",
 				# "emptyBarcode": true,
 				# "emptyBarcodeReason": "상품확인불가_바코드없음사유",
@@ -207,19 +204,15 @@ for code in all_code:
 				],
 				"contents": [
 				{
-					"contentsType": "TEXT",
+					"contentsType": "IMAGE",
 					"contentDetails": [
 					{
 						"content": "http://jdx.coreits.co.kr/jdx/X123_topss",
-						"detailType": "TEXT"
-					},
-					{
-						"content": "A/S 책임자와 전화번호 : 031-380-1451",
-						"detailType": "TEXT"
+						"detailType": "IMAGE"
 					}
 					]
 				}
-				],
+				]
 				# "offerCondition": "NEW",
 				# "offerDescription": ""
 			}
@@ -227,10 +220,12 @@ for code in all_code:
 
 
 	#****************************************************************************************************************#
+	# os.environ['TZ'] = 'GMT+0'
+	# datetime=time.strftime('%y%m%d')+'T'+time.strftime('%H%M%S')+'Z'
 
-
-	os.environ['TZ'] = 'GMT+0'
-	datetime=time.strftime('%y%m%d')+'T'+time.strftime('%H%M%S')+'Z'
+	dateGMT = strftime('%y%m%d', gmtime())
+	timeGMT = strftime('%H%M%S', gmtime())
+	datetime = dateGMT + 'T' + timeGMT + 'Z'
 
 	method = "POST"
 	path = "/v2/providers/seller_api/apis/api/v1/marketplace/seller-products"
@@ -319,46 +314,39 @@ for code in all_code:
 		# 200
 		body = resp.read().decode(resp.headers.get_content_charset())
 		print(body)
-		print(body[-12:-1])
-	
-	break
 
-#****************************************************************************************************************
-#selenium detail image upload
-from selenium import webdriver
-from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.common.by import By
-import pyautogui
-import time
+# 	# # ****************************************************************************************************************
+# 	# #selenium detail image upload
 
-magic_num =2
+	body_code = body[-12:-1]
+	driver = webdriver.Chrome(r"C:\Users\bel03\OneDrive\바탕 화면\WORK\coupang\jdx\chromedriver.exe")
+	driver.get(f"https://wing.coupang.com/tenants/seller-web/vendor-inventory/modify?vendorInventoryId={body_code}&searchIds=&startTime=2000-01-01&endTime=2099-12-31&productName=&brandName=&manufacturerName=&productType=&dateType=productRegistrationDate&dateRangeShowStyle=true&dateRange=all&saleEndDatePeriodType=&includeUsedProduct=&deleteType=false&deliveryMethod=&shippingType=&shipping=&otherType=&productStatus=SAVED,WAIT_FOR_SALE,SOLD_OUT,END_FOR_SALE,APPROVING,IN_REVIEW,DENIED,APPROVED&advanceConditionShow=false&displayCategoryCodes=&currentMenuCode=&page=1&countPerPage=50&sortField=vendorInventoryId&desc=true&fromListV2=true")
+	elem_id = driver.find_element_by_id("userID")
+	elem_id.send_keys("aa4151")
+	elem_pw = driver.find_element_by_id("userPWD")
+	elem_pw.send_keys("kk8929$$")
+	elem_pw.send_keys(Keys.RETURN)
+	time.sleep(2)
 
-# body_code = body[-12:-1]
-body_code = 11341176549
-driver = webdriver.Chrome()
-driver.get(f"https://wing.coupang.com/tenants/seller-web/vendor-inventory/modify?vendorInventoryId={body_code}&searchIds=&startTime=2000-01-01&endTime=2099-12-31&productName=&brandName=&manufacturerName=&productType=&dateType=productRegistrationDate&dateRangeShowStyle=true&dateRange=all&saleEndDatePeriodType=&includeUsedProduct=&deleteType=false&deliveryMethod=&shippingType=&shipping=&otherType=&productStatus=SAVED,WAIT_FOR_SALE,SOLD_OUT,END_FOR_SALE,APPROVING,IN_REVIEW,DENIED,APPROVED&advanceConditionShow=false&displayCategoryCodes=&currentMenuCode=&page=1&countPerPage=50&sortField=vendorInventoryId&desc=true&fromListV2=true")
-elem_id = driver.find_element_by_id("userID")
-elem_id.send_keys("aa4151")
-elem_pw = driver.find_element_by_id("userPWD")
-elem_pw.send_keys("kk8929$$")
-elem_pw.send_keys(Keys.RETURN)
-time.sleep(2)
+	checkB = driver.find_element_by_xpath("/html/body/div[1]/div[2]/div/div[2]/div[5]/div/div/div[2]/div/div/div[2]/div/div[3]/table/thead/tr/th[1]/span/input")
+	checkB.send_keys(webdriver.common.keys.Keys.SPACE)
 
-checkB = driver.find_element_by_xpath("/html/body/div[1]/div[2]/div/div[2]/div[5]/div/div/div[2]/div/div/div[2]/div/div[3]/table/thead/tr/th[1]/span/input")
-checkB.send_keys(webdriver.common.keys.Keys.SPACE)
-element_present = EC.presence_of_element_located((By.XPATH, "//*[@id='panel-product-image']/div/div/div[2]/div/div/div[2]/div/div[2]/a[2]"))  # Example xpath
-for i in range(magic_num):	
-	WebDriverWait(driver, 10).until(element_present).click() # This opens the windows file selector
-	time.sleep(1)
-	pyautogui.write(f"C:\\jdximg\\new{i+1}.png", interval=0.1) 
-	pyautogui.press('return')
+	element_present = EC.presence_of_element_located((By.XPATH, "//*[@id='panel-product-image']/div/div/div[2]/div/div/div[2]/div/div[2]/a[2]"))  # Example xpath
+	for i in range(magic_num):
+		try:
+			WebDriverWait(driver, 10).until(element_present).click() # This opens the windows file selector
+			time.sleep(1)
+			pyautogui.write(f"C:\\jdximg\\new{i+1}.png", interval=0.1) 
+			pyautogui.press('return')
+			time.sleep(1)
+		except:
+			errorB = driver.find_element_by_xpath("/html/body/div[4]/div[2]/div[6]/button[2]")
+			errorB.send_keys(webdriver.common.keys.Keys.SPACE)
+
+	saveB = driver.find_element_by_xpath("/html/body/div[1]/div[2]/div/div[2]/footer/div/div/div[2]/button[1]")
+	saveB.send_keys(webdriver.common.keys.Keys.RETURN)
+
+	driver.close()
 
 
-saveB = driver.find_element_by_xpath("/html/body/div[1]/div[2]/div/div[2]/footer/div/div/div[2]/button[1]")
-saveB.send_keys(webdriver.common.keys.Keys.SPACE)
-
-	# driver.find_element_by_css_selector("input[type='file']").send_keys(r"C:\Users\user-pc\Desktop\test.PNG")
-
-PendingDeprecationWarning
+	break	
